@@ -1,0 +1,4 @@
+#define grayStipple_width 2
+#define grayStipple_height 2
+static unsigned char grayStipple_bits[] = {
+   0x01, 0x02};
