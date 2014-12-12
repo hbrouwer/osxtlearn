@@ -2942,13 +2942,15 @@ void XReportCondition(char *message, int level)
 
 static void AboutBox(Widget w, XtPointer client_data, XtPointer call_data)
 {
-    sprintf(buf, "%s version %s\nby %s, @crl.ucsd.edu %s.%s", 
+    sprintf(buf, "%s version %s\nby %s, @crl.ucsd.edu %s.\n\n" \
+                    "OSXtlearn by Harm Brouwer <me@hbrouwer.eu>\n%s", 
         PROGRAM_NAME, PROGRAM_VERSION, PROGRAMMERS, PROGRAM_DATE,
 #ifdef EXP_TABLE
 	"\nRequires exp table: "EXP_TABLE);
 #else
         "");
 #endif
+
     AlertBox(buf, 0, "     OK     ", 0, 0);
 }
 

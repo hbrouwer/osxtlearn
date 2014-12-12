@@ -94,8 +94,8 @@ typedef struct {
         char alias[MAX_WORD_LENGTH];
 } Command;
 
-#define NO_ALIAS        ""
-#define NO_WORD         ""
+#define NO_ALIAS        " "
+#define NO_WORD         " "
 #define CLI_ERROR_POINTS 40
 
 #define INIT_FILE       ".xtlearn_init"
@@ -178,7 +178,7 @@ static int cli_run_system(void);
 int init_cli(int argc, char **argv)
 {
     report_condition("Interactive command line mode - \"help\" for help.", 0);
-    return prepare_cli(argv[0]);
+    return prepare_cli("OSXTlearn");
 }
 
 
@@ -200,6 +200,7 @@ static int prepare_cli(char *program_name)
     for(i=0;i < MAX_ARGUMENTS;i++) {
         if ((tokens[i]=(char*)calloc(MAX_WORD_LENGTH, sizeof(char))) == NULL)
             return report_condition("tokens[] calloc failed.", 3);
+        strcpy(tokens[i], NO_WORD);
     }
 
     /* Prepare command array. */
@@ -207,11 +208,11 @@ static int prepare_cli(char *program_name)
         return report_condition("commands calloc failed.", 3);
     }
 
-
     /* Search for and open initialization file: */
     sprintf(file_location1, "./%s", INIT_FILE);
     if (getenv("HOME") != NULL) {
-        sprintf(file_location2, (char*)getenv("HOME"));
+        // XXX: not sure if this is correct (added "%s")
+        sprintf(file_location2, "%s", (char*)getenv("HOME"));
     }
     strcat(file_location2, "/"); strcat(file_location2, INIT_FILE);
     if ((alias_file= fopen(file_location1, "r")) == NULL) {
@@ -344,7 +345,7 @@ static Command retrieve_command(char *word)
     }
 
     for(i= 1; i < total_commands; i++) {
-        if (strcmp(word, commands[i].word) == 0) {
+        if (strncmp(word, commands[i].word, strlen(commands[i].word)) == 0) {
             return commands[i];
         }
     }
@@ -363,8 +364,8 @@ static Command unalias(char *word)
         return commands[0];
     }
     for(i=1;i < total_commands;i++) {
-        if (strcmp(word, commands[i].word) == 0) {
-            if (strcmp(commands[i].alias, NO_ALIAS) != 0) {
+        if (strncmp(word, commands[i].word, strlen(commands[i].word)) == 0) {
+            if (strncmp(commands[i].alias, NO_ALIAS, strlen(NO_ALIAS)) != 0) {
                 return unalias(commands[i].alias);
             }
             else {
@@ -380,7 +381,8 @@ static Command unalias(char *word)
            prompt the user for more input. */
 static char *get_next_word(void)
 {
-    char temp[64];
+    static char temp[64];
+
     if (current_token < MAX_ARGUMENTS) {
         strcpy(temp, tokens[current_token]);
         strcpy(tokens[current_token], NO_WORD);
@@ -400,14 +402,14 @@ static int figure_out(char *token)
     char shell_line[512];
     char word1[64];
 
-    if (strcmp(token, NO_WORD) == 0) return CLI_UNKNOWN_ID;
+    if (strncmp(token, NO_WORD, strlen(NO_WORD)) == 0) return CLI_UNKNOWN_ID;
     if (token != NULL) {
         strcpy(cli_command, token);
         current_command= unalias(cli_command);
         if (current_command.action_id == CLI_UNKNOWN_ID) {
             strcpy(shell_line, NO_WORD);
             strcpy(word1, token);
-            while(strcmp(word1, NO_WORD) != 0) {
+            while(strncmp(word1, NO_WORD, strlen(NO_WORD)) != 0) {
                 strcat(shell_line, word1);
                 strcat(shell_line, " ");
                 strcpy(word1, get_next_word());
@@ -429,10 +431,10 @@ static int get_next_command(void)
     char line[512];
 
     strcpy(word, get_next_word());
-    if (strcmp(word, NO_WORD) == 0) {
+    if (strncmp(word, NO_WORD, strlen(NO_WORD)) == 0) {
         if (!file_input) {
             printf("%s", prompt);
-            gets(line);
+            fgets(line, 512, stdin);
         }
         else if ((fgets(line, MAX_LINE_LENGTH, alias_file)) ==  NULL) {
             file_input= 0;
@@ -449,6 +451,7 @@ static int get_next_command(void)
             if (current_input>MAX_HISTORY) current_input=0;
             lex(cli_input_line[current_input]);
             strcpy(word, get_next_word());
+            current_input++;
             return figure_out(word);
         }
     }
@@ -467,7 +470,7 @@ int run_cli(void)
     char shell_line[512];
     char word1[64], word2[64];
 
-    printf("Welcome to xtlearn.\n");
+    printf("Welcome to OSXlearn.\n");
 
     while(1) {
         command_id= get_next_command();
@@ -528,7 +531,7 @@ int run_cli(void)
                 break;
             case CLI_SHELL_ID:
                 strcpy(shell_line, NO_WORD);
-                while(strcmp(strcpy(word1, get_next_word()), NO_WORD) != 0) {
+                while(strncmp(strcpy(word1, get_next_word()), NO_WORD, strlen(NO_WORD)) != 0) {
                     strcat(shell_line, word1);
                     strcat(shell_line, " ");
                 }
@@ -557,10 +560,10 @@ int run_cli(void)
             case CLI_ALIAS_ID:
                 strcpy(word1, get_next_word());
                 strcpy(word2, get_next_word());
-                if (strcmp(word1, NO_WORD) == 0) {
+                if (strncmp(word1, NO_WORD, strlen(NO_WORD)) == 0) {
                     cli_help();
                 }
-                else if (strcmp(word2, NO_WORD) == 0) {
+                else if (strncmp(word2, NO_WORD, strlen(NO_WORD)) == 0) {
                     sprintf(message, "Alias \"%s\" to what command?", word1);
                     report_condition(message, 2);
                 }
@@ -586,12 +589,12 @@ int run_cli(void)
                 break;
             case CLI_FILEROOT_ID:
                 strcpy(word1, get_next_word());
-                if (strcmp(word1, NO_WORD) != 0) strcpy(root, word1);
+                if (strncmp(word1, NO_WORD, strlen(NO_WORD)) != 0) strcpy(root, word1);
                 else report_condition("Set file root to what?", 2);
                 break;
             case CLI_WEIGHTS_FILE_ID:
                 strcpy(word1, get_next_word());
-                if (strcmp(word1, NO_WORD) != 0) {
+                if (strncmp(word1, NO_WORD, strlen(NO_WORD)) != 0) {
                     strcpy(loadfile, word1);
                     sprintf(message, "Load weights from:        \"%s\"", loadfile);
                     report_condition(message, 0);
@@ -604,17 +607,17 @@ int run_cli(void)
                 break;
             case CLI_SWEEPS_ID:
                 strcpy(word1, get_next_word());
-                if (strcmp(word1, NO_WORD) != 0) nsweeps= atoi(word1);
+                if (strncmp(word1, NO_WORD, strlen(NO_WORD)) != 0) nsweeps= atoi(word1);
                 else report_condition("How many sweeps?", 2);
                 break;
             case CLI_WEIGHTS_MOMENTUM_ID:
                 strcpy(word1, get_next_word());
-                if (strcmp(word1, NO_WORD) != 0) momentum= atof(word1);
+                if (strncmp(word1, NO_WORD, strlen(NO_WORD)) != 0) momentum= atof(word1);
                 else report_condition("Set momentum to what?", 2);
                 break;
             case CLI_LEARNING_RATE_ID:
                 strcpy(word1, get_next_word());
-                if (strcmp(word1, NO_WORD) != 0) rate= atof(word1);
+                if (strncmp(word1, NO_WORD, strlen(NO_WORD)) != 0) rate= atof(word1);
                 else report_condition("Set learning rate to what?", 2);
                 break;
             case CLI_ERROR_TYPE_ID:
@@ -625,32 +628,32 @@ int run_cli(void)
                 break;
             case CLI_ERROR_REPORT_ID:
                 strcpy(word1, get_next_word());
-                if (strcmp(word1, NO_WORD) != 0) rms_report= atoi(word1);
+                if (strncmp(word1, NO_WORD, strlen(NO_WORD)) != 0) rms_report= atoi(word1);
                 else report_condition("How many sweeps per error report?", 2);
                 break;
             case CLI_ERROR_STOP_ID:
                 strcpy(word1, get_next_word());
-                if (strcmp(word1, NO_WORD) != 0) criterion= atof(word1);
+                if (strncmp(word1, NO_WORD, strlen(NO_WORD)) != 0) criterion= atof(word1);
                 else report_condition("Stop when error falls below what?", 2);
                 break;
             case CLI_WEIGHTS_UPDATE_ID:
                 strcpy(word1, get_next_word());
-                if (strcmp(word1, NO_WORD) != 0) umax= atoi(word1);
+                if (strncmp(word1, NO_WORD, strlen(NO_WORD)) != 0) umax= atoi(word1);
                 else report_condition("How many sweeps per weights update?", 2);
                 break;
             case CLI_WEIGHTS_SAVE_ID:
                 strcpy(word1, get_next_word());
-                if (strcmp(word1, NO_WORD) != 0) check= atoi(word1);
+                if (strncmp(word1, NO_WORD, strlen(NO_WORD)) != 0) check= atoi(word1);
                 else report_condition("How many sweeps per weights save?", 2);
                 break;
             case CLI_BIAS_OFFSET_ID:
                 strcpy(word1, get_next_word());
-                if (strcmp(word1, NO_WORD) != 0) init_bias= atof(word1);
+                if (strncmp(word1, NO_WORD, strlen(NO_WORD)) != 0) init_bias= atof(word1);
                 else report_condition("Set bias offset to what?", 2);
                 break;
                 case CLI_BPTT_ID:
                 strcpy(word1, get_next_word());
-                if (strcmp(word1, NO_WORD) != 0) {
+                if (strncmp(word1, NO_WORD, strlen(NO_WORD)) != 0) {
                     copies= atoi(word1);
                     if (copies < 2) {
                         bptt= 0;
@@ -666,7 +669,7 @@ int run_cli(void)
                 break;
             case CLI_SEED_ID:
                 strcpy(word1, get_next_word());
-                if (strcmp(word1, NO_WORD) != 0) {
+                if (strncmp(word1, NO_WORD, strlen(NO_WORD)) != 0) {
                     seed= atoi(word1);
                     if (seed <= 0) {
                         fixedseed= 0;
@@ -718,7 +721,7 @@ static void print_command(Command command)
 {
     if (command.action_id != CLI_UNKNOWN_ID) printf("%s", command.word);
     else if (command.action_id == CLI_UNKNOWN_ID) printf("<no mapping>");
-    if (strcmp(command.alias, NO_ALIAS) != 0) {
+    if (strncmp(command.alias, NO_ALIAS, strlen(NO_ALIAS)) != 0) {
         printf("        = ");
         print_command(retrieve_command(command.alias));
     }
@@ -823,9 +826,10 @@ static void cli_restore_default_settings(void)
         /* Shows version information. */
 static void cli_display_info(void)
 {
-    char dummy[80];
+    char dummy[256];
 
-    sprintf(dummy, "%s version %s,\nby %s\n@crl.ucsd.edu, %s.%s", 
+    sprintf(dummy, "%s version %s\nby %s, @crl.ucsd.edu %s.\n\n" \
+                    "OSXtlearn by Harm Brouwer <me@hbrouwer.eu>\n%s", 
         PROGRAM_NAME, PROGRAM_VERSION, PROGRAMMERS, PROGRAM_DATE,
 #ifdef EXP_TABLE
 	"\nRequires exp table: "EXP_TABLE);

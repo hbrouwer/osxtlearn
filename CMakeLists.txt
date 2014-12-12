@@ -7,12 +7,12 @@ project(OSXtlearn)
 include(CheckIncludeFile)
 
 set(VERSION "OSX-1.0a")
-set(CMAKE_VERBOSE_MAKEFILE 1)
+#set(CMAKE_VERBOSE_MAKEFILE 1)
 
 # setup OSX build
 set(PROGNAME OSXtlearn)
 set(CMAKE_OSX_ARCHITECTURES "x86_64;i386")
-set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9")
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.5")
 
 # X11 for linking
 set(X11_INCLUDE_DIR 
@@ -24,13 +24,17 @@ set(X11_LIBRARIES
         # We also want Xaw and Xt
         /opt/X11/lib/libXaw.dylib
         /opt/X11/lib/libXt.dylib
+        # debug...
+        /opt/X11/lib/libXmu.dylib
+        /opt/X11/lib/libICE.dylib
+        /opt/X11/lib/libXpm.dylib
+        /opt/X11/lib/libSM.dylib
         )
 include_directories(${X11_INCLUDE_DIR})
 link_libraries(${X11_LIBRARIES})
 
 # compiler flags
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I/opt/X11/include -DXTLEARN")
-
 # source files
 set(OSXtlearn_SRC
         src/activate.c
@@ -53,6 +57,15 @@ set(OSXtlearn_SRC
         src/xtlearnWtsDisp.c
         )
 
+# MacOSX resources¬
+set(OSXtlearn_MACOSX_RESOURCE_FILES
+        ${OSXtlearn_SOURCE_DIR}/OSXtlearn.icns)
+
+set_source_files_properties(
+        ${OSXtlearn_MACOSX_RESOURCE_FILES}
+        PROPERTIES
+        MACOSX_PACKAGE_LOCATION Resources)
+
 # executable that we want to build
 add_executable(${PROGNAME} MACOSX_BUNDLE 
         ${OSXtlearn_SRC}
@@ -64,15 +77,12 @@ install(TARGETS ${PROGNAME}
 # wrap everything into an application bundle
 set(MACOSX_BUNDLE_NAME "OSXtlearn")
 set(MACOSX_BUNDLE_VERSION ${VERSION})
-#set(MACOSX_BUNDLE_ICON_FILE "LensOSX.icns")
+set(MACOSX_BUNDLE_ICON_FILE "OSXtlearn.icns")
 set(MACOSX_BUNDLE_GUI_IDENTIFIER "de.uni-saarland.osxtlearn")
 
 set(DIRS ${X11_LIBRARY_PATH})
 install(CODE 
-        "execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory
-                \"${OSXtlearn_SOURCE_DIR}/bitmaps/\" 
-                \"${APP}/Contents/MacOS/bitmaps/\")
-        include(BundleUtilities) 
+        "include(BundleUtilities) 
         fixup_bundle(\"${APP}\" \"\" \"${DIRS}\")"
         COMPONENT Runtime)
 set(CPACK_BINARY_DRAGNDROP "ON")

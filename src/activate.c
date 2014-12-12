@@ -11,7 +11,7 @@ extern  long    exp_add;
 #define EXP(m) (exp_array[((int) ((m) * exp_mult)) + exp_add])
 #else
 #define EXP exp
-#endif  EXP_TABLE
+#endif /* EXP_TABLE */
 
 
 extern  int nn;             /* number of nodes */
@@ -90,10 +90,11 @@ int act_nds(float *aold, float *amem,
                      zo++, ci++, on++){
                     if (ci->con){
                         if (on->targ){
-                            if (*t == -9999.) /* don't care */
+                            if (*t == -9999.) { /* don't care */
                                 *zn += *w * *zo;
-                            else
+                            } else {
                                 *zn += *w * *t++;
+                            }
                             if (++tcnt > no){
                                 report_condition("Teacher forcing requires each output feeding exactly one node.",2);
                                 return 1;
@@ -101,16 +102,23 @@ int act_nds(float *aold, float *amem,
                         }
                         else
                             /* REC STUFF */
-                            if(ci->rec==1) *zn += *w * *rzo;
-                            else *zn += *w * *zo;
+                            if(ci->rec==1) { 
+                                    *zn += *w * *rzo;
+                            } else {
+                                    *zn += *w * *zo;
+                            }
                     }
                 }
             }
             else {
                 for (j = 0; j < nn; j++, w++, zo++, ci++, rzo++){
-                    if (ci->con)
-                        if(ci->rec==1) *zn += *w * *rzo;
-                        else *zn += *w * *zo;
+                    if (ci->con) {
+                        if(ci->rec==1) {
+                                *zn += *w * *rzo;
+                        } else { 
+                                *zn += *w * *zo;
+                        }
+                    }
                 }
             }
             /* apply activation function        */

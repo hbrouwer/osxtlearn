@@ -9,7 +9,7 @@ extern GC appGC, revGC;
 extern Display *appDisplay;
 extern int appDepth, gRunning;
 extern Cursor waitCursor;
-extern learning, verify, probe, randomly;
+extern int learning, verify, probe, randomly;
 extern long tmax;
 
 Pixmap actPixmap; 
@@ -163,7 +163,7 @@ static void NextStepActDisplay(Widget w, XtPointer client_data, XtPointer call_d
     verify = 0;
     learning= 0;
     randomly= 0;
-/*  probe= 1;   /* Displays selected nodes if output window is open */
+/*  probe= 1;   // Displays selected nodes if output window is open */
 
     patternNo++;
     if (patternNo > tmax) patternNo= 1;

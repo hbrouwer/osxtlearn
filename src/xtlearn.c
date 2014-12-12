@@ -267,7 +267,7 @@ int main(int argc, char **argv)
     if (!*root && optind +1 == argc) /* If root wasn't given w/ -f and there's */
         strcpy(root, argv[optind]);  /* a token remaining; assume its the root */
 
-    strcpy(saveroot, root); 
+    strcpy(saveroot, root);
 
     if (exp_init()) return -1;  /* Does nothing if EXP_TABLE is undefined */
 

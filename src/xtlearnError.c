@@ -6,6 +6,7 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "general.h"
 #include "xtlearnIface.h"
@@ -16,7 +17,7 @@
 extern int interactive, batch_mode;
 
 static FILE *FilePtr;
-static char FileName[40];
+static char FileName[128]; // XXX: instead of 40
 static char FileType[20];
 static char ErrorMsg[MAX_ERRORMSG_LEN];
 

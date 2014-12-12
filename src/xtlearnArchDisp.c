@@ -5,8 +5,8 @@
 #include "xtlearnIface.h"
 #include "xtlearnArchDisp.h"
 
-extern show_slabs, show_node_numbers, show_arrowheads, show_bias_node;
-extern arch_orientation;
+extern int show_slabs, show_node_numbers, show_arrowheads, show_bias_node;
+extern int arch_orientation;
 
 extern Pixmap 
     checkedCB, uncheckedCB,

@@ -37,7 +37,7 @@ void InitAlertBox(XtAppContext appContxt, Widget appWidget)
         RootWindowOfScreen(XtScreen(appWidget)),
         tlearnIcon_bits, tlearnIcon_width, tlearnIcon_height);
 
-    dAlertShell= XtVaCreatePopupShell("xtlearn alert", 
+    dAlertShell= XtVaCreatePopupShell("OSXtlearn alert", 
         transientShellWidgetClass, appWidget, NULL);
 
     dAlertForm= XtVaCreateManagedWidget("dAlertForm",
@@ -63,7 +63,7 @@ void InitAlertBox(XtAppContext appContxt, Widget appWidget)
         XtNborderWidth, 0,
         XtNvertDistance, 15,
         XtNwidth, 380,
-        XtNheight, 80,
+        XtNheight, 100,
         XtNsensitive, FALSE,
         XtNcursor, NULL,
         XtNdisplayCaret, 0,
