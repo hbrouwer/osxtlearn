@@ -1725,7 +1725,7 @@ void InitXInterface(int argc, char **argv)
         XtNsensitive, FALSE,
         XtNcursor, NULL,
         XtNdisplayCaret, 0,
-        XtNstring, "\n\nWelcome to xtlearn.",
+        XtNstring, "\n\nWelcome to OSXtlearn.",
         NULL);
 
     setProjShell= XtVaCreatePopupShell("xtlearn Set Project Name", 

@@ -178,7 +178,7 @@ static int cli_run_system(void);
 int init_cli(int argc, char **argv)
 {
     report_condition("Interactive command line mode - \"help\" for help.", 0);
-    return prepare_cli("OSXTlearn");
+    return prepare_cli("OSXtlearn");
 }
 
 
@@ -470,7 +470,7 @@ int run_cli(void)
     char shell_line[512];
     char word1[64], word2[64];
 
-    printf("Welcome to OSXlearn.\n");
+    printf("Welcome to OSXtlearn.\n");
 
     while(1) {
         command_id= get_next_command();
