@@ -1373,7 +1373,7 @@ void InitXInterface(int argc, char **argv)
         "XTlearn*mTrainBar.label: Train",
         "XTlearn*mTestBar.label:  Test",
         "XTlearn*mDispBar.label:  Displays",
-        "XTlearn*mFilePane0.label: About xtlearn...",
+        "XTlearn*mFilePane0.label: About OSXtlearn...",
         "XTlearn*mFilePane1.label: Set Project",
         "XTlearn*mFilePane2.label: Quit",
         "XTlearn*mTrainPane0.label: Training Options...",
