@@ -81,8 +81,12 @@ set(MACOSX_BUNDLE_ICON_FILE "OSXtlearn.icns")
 set(MACOSX_BUNDLE_GUI_IDENTIFIER "de.uni-saarland.osxtlearn")
 
 set(DIRS ${X11_LIBRARY_PATH})
-install(CODE 
-        "include(BundleUtilities) 
+set(APP ${OSXtlearn_SOURCE_DIR}/${PROGNAME}.app)
+install(CODE "
+        execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory
+                \"${OSXtlearn_SOURCE_DIR}/examples\" 
+                \"${APP}/Contents/MacOS/examples\")
+        include(BundleUtilities) 
         fixup_bundle(\"${APP}\" \"\" \"${DIRS}\")"
         COMPONENT Runtime)
 set(CPACK_BINARY_DRAGNDROP "ON")
